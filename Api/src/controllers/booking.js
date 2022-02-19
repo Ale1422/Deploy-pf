@@ -1,5 +1,4 @@
 const { User, Establishment, Site, Court, Booking, Op } = require("../db");
-const {axios} = require ('axios')
 // const { DB_HOST, TUCANCHAYAMAIL, TUCANCHAYAMAILPASS } = process.env;
 // const nodemailer = require("nodemailer");
 const { randomString, minutesToHour } = require("./utils/utils");
@@ -15,9 +14,9 @@ const getAllBookings = async (req, res, next) => {
 };
 
 const newBooking = async (req, res, next) => {
-  const {data}= req.body
-  const payData = await axios(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=TEST-8344826949636961-021621-fa6f50dd49774c61c2de981dba9fbeae-157434994`)
-
+  const data= req.body
+  //const payData = await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=TEST-8344826949636961-021621-fa6f50dd49774c61c2de981dba9fbeae-157434994`)
+console.log(data)
   try {
       if(payData.data.status_detail === "accredited"){
           // const reporte = await Report.create({
@@ -25,7 +24,7 @@ const newBooking = async (req, res, next) => {
           //     idpago: payData.data.status_detail
           // })
           console.log(payData.data);
-          res.status(200).send(payData)
+          res.status(200).send(req.body)
       }
   } catch (error) {
       res.status(404).send(error)
