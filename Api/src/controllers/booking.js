@@ -18,14 +18,14 @@ const newBooking = async (req, res, next) => {
   //const payData = await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=TEST-8344826949636961-021621-fa6f50dd49774c61c2de981dba9fbeae-157434994`)
 console.log(data)
   try {
-      if(payData.data.status_detail === "accredited"){
+//      if(payData.data.status_detail === "accredited"){
           // const reporte = await Report.create({
           //     name: payData.data.status,
           //     idpago: payData.data.status_detail
           // })
           console.log(payData.data);
           res.status(200).send(req.body)
-      }
+//      }
   } catch (error) {
       res.status(404).send(error)
   }
