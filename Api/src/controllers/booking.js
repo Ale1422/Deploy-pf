@@ -1,6 +1,6 @@
 const { User, Establishment, Site, Court, Booking, Op } = require("../db");
-const { DB_HOST, TUCANCHAYAMAIL, TUCANCHAYAMAILPASS } = process.env;
-const nodemailer = require("nodemailer");
+// const { DB_HOST, TUCANCHAYAMAIL, TUCANCHAYAMAILPASS } = process.env;
+// const nodemailer = require("nodemailer");
 const { randomString, minutesToHour } = require("./utils/utils");
 
 const getAllBookings = async (req, res, next) => {
@@ -233,51 +233,51 @@ const getBookingsByEstablishment = async (req,res)=>{
 
   res.send(establishment)
 }
-async function emailSender(userId, code) {
-  const userData = await User.findOne({ where: { id: userId } });
+// async function emailSender(userId, code) {
+//   const userData = await User.findOne({ where: { id: userId } });
 
-  let contentHTML = `
-  <h3>Hola, ${userData.name}!</h3>
+//   let contentHTML = `
+//   <h3>Hola, ${userData.name}!</h3>
 
-  <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
-  <h2>&#9917; ${code} &#9917;</h2>
-  `;
-  let transporter = nodemailer.createTransport({
-    host: "smtp.mailgun.org",
-    port: 587,
-    secure: false, // sin SSL
-    auth: {
-      user: TUCANCHAYAMAIL, // generated ethereal user
-      pass: TUCANCHAYAMAILPASS, // generated ethereal password
-    },
-  });
+//   <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
+//   <h2>&#9917; ${code} &#9917;</h2>
+//   `;
+//   let transporter = nodemailer.createTransport({
+//     host: "smtp.mailgun.org",
+//     port: 587,
+//     secure: false, // sin SSL
+//     auth: {
+//       user: TUCANCHAYAMAIL, // generated ethereal user
+//       pass: TUCANCHAYAMAILPASS, // generated ethereal password
+//     },
+//   });
 
-  const response = await transporter.sendMail({
-    from: "'Tu Cancha YA!' <tucanchaya@noresponse.com>",
-    to: `${userData.email}`,
-    subject: "Codigo de reserva",
-    html: contentHTML,
-  });
+//   const response = await transporter.sendMail({
+//     from: "'Tu Cancha YA!' <tucanchaya@noresponse.com>",
+//     to: `${userData.email}`,
+//     subject: "Codigo de reserva",
+//     html: contentHTML,
+//   });
 
-  console.log(response);
-}
-const prueba = async (req, res, next) => {
-  let code = randomString(8);
-  emailSender(1, code);
-  res.send("funciona");
-};
-const courtBookings = async (req, res, next) => {
-  const { courtId } = req.params;
-  try {
-    const courtBooking = await Court.findAll({
-      where: { id: courtId },
-    });
+//   console.log(response);
+// }
+// const prueba = async (req, res, next) => {
+//   let code = randomString(8);
+//   emailSender(1, code);
+//   res.send("funciona");
+// };
+// const courtBookings = async (req, res, next) => {
+//   const { courtId } = req.params;
+//   try {
+//     const courtBooking = await Court.findAll({
+//       where: { id: courtId },
+//     });
 
-    res.send(courtBooking)
-  } catch (error) {
-    next(error);
-  }
-}
+//     res.send(courtBooking)
+//   } catch (error) {
+//     next(error);
+//   }
+// }
 ;
 
 module.exports = {
