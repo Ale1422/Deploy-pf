@@ -102,7 +102,7 @@ const createPreference = async (req, res, next) => {
       //Este valor reemplazará el string"<%= global.id %>" en tu HTML
       console.log(response)
       global.id = response.body.sandbox_init_point;
-      res.send(global.id);
+      res.send(response.body.sandbox_init_point);
     })
     .catch(function (error) {
       console.log(error);
