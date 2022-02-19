@@ -93,7 +93,6 @@ const createPreference = async (req, res, next) => {
     statement_descriptor: establishmentName,
     external_reference: toString(userId),
     expires: true,
-    auto_return: "approved",
     binary_mode: true,
  }
   mercadopago.preferences
@@ -102,7 +101,7 @@ const createPreference = async (req, res, next) => {
     .then(function (response) {
       //Este valor reemplazará el string"<%= global.id %>" en tu HTML
       console.log(response)
-      global.id = response.body.id;
+      global.id = response.body.sandbox_init_point;
       res.send(global.id);
     })
     .catch(function (error) {
