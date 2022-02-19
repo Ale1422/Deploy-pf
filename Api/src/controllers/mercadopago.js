@@ -84,7 +84,7 @@ const createPreference = async (req, res, next) => {
         email: user.email
     },
     back_urls: {
-      success: "https://localhost:3000",
+      success: "https://localhost:3000/profile",
       failure: "https://localhost:3000",
       pending: "https://localhost:3000"
     },
@@ -92,7 +92,9 @@ const createPreference = async (req, res, next) => {
     notification_url: "https://pi-foodandcook.herokuapp.com/booking/new",
     statement_descriptor: establishmentName,
     external_reference: toString(userId),
-    expires: true
+    expires: true,
+    auto_return: "approved",
+    binary_mode: true,
  }
   mercadopago.preferences
     .create(preference)
