@@ -93,7 +93,7 @@ const createPreference = async (req, res, next) => {
     auto_return: "approved",
     notification_url: "https://pi-foodandcook.herokuapp.com/booking/new",
     statement_descriptor: establishmentName,
-    external_reference: userId,
+    external_reference: toString(userId),
     expires: true
  }
   mercadopago.preferences
