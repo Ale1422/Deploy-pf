@@ -44,25 +44,25 @@ const createPreference = async (req, res, next) => {
     ":" +
     endTimeDate.getMinutes();
 
-  const bookingId = Math.floor(1000 + Math.random() * 9000);
-  // Crea un objeto de preferencia
-  let preference = {
-    items: [{ title: courtName + ": " + date, unit_price: price, quantity: 1 }],
-    external_reference: randomString(8),
-    payment_methods: {
-      excluded_payment_types: [{ id: "atm" }, { id: "ticket" }],
-      installments: 1, //Cantidad máximo de cuotas
-    },
-    back_urls: {
-      success: `http://${DB_HOST}:3001/booking/new/${userId}/${courtId}/${price}/${startTime}/${endTime}`,
-      failure: `http://${DB_HOST}:3000/`, //corregir para que redireccione al componente donde elije horario
-      pending: `http://${DB_HOST}:3000/`, //corregir para que redireccione al componente donde elije horario
-    },
-    auto_return: "approved",
-    binary_mode: true,
-  };
+  // const bookingId = Math.floor(1000 + Math.random() * 9000);
+  // // Crea un objeto de preferencia
+  // let preference1 = {
+  //   items: [{ title: courtName + ": " + date, unit_price: price, quantity: 1 }],
+  //   external_reference: randomString(8),
+  //   payment_methods: {
+  //     excluded_payment_types: [{ id: "atm" }, { id: "ticket" }],
+  //     installments: 1, //Cantidad máximo de cuotas
+  //   },
+  //   back_urls: {
+  //     success: `http://${DB_HOST}:3001/booking/new/${userId}/${courtId}/${price}/${startTime}/${endTime}`,
+  //     failure: `http://${DB_HOST}:3000/`, //corregir para que redireccione al componente donde elije horario
+  //     pending: `http://${DB_HOST}:3000/`, //corregir para que redireccione al componente donde elije horario
+  //   },
+  //   auto_return: "approved",
+  //   binary_mode: true,
+  // };
 
-  let preference2={
+  let preference={
     items :[
         {
             id : courtId,
@@ -91,12 +91,11 @@ const createPreference = async (req, res, next) => {
       pending: "https://localhost:3000"
     },
     auto_return: "approved",
-    notification_url: "https://pi-foodandcook.herokuapp.com/report",
+    notification_url: "https://pi-foodandcook.herokuapp.com/booking/new",
     statement_descriptor: establishmentName,
     external_reference: userId,
     expires: true
  }
-console.log(preference2);
   mercadopago.preferences
     .create(preference)
 
