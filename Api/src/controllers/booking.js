@@ -24,8 +24,7 @@ const newBooking = async (req, res, next) => {
           //     name: payData.data.status,
           //     idpago: payData.data.status_detail
           // })
-          console.log(payData.data);
-          res.status(200).send(req.body,payData)
+          res.status(200).send(data)
 //      }
   } catch (error) {
       res.status(404).send(error)
