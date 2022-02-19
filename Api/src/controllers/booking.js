@@ -266,18 +266,18 @@ const getBookingsByEstablishment = async (req,res)=>{
 //   emailSender(1, code);
 //   res.send("funciona");
 // };
-// const courtBookings = async (req, res, next) => {
-//   const { courtId } = req.params;
-//   try {
-//     const courtBooking = await Court.findAll({
-//       where: { id: courtId },
-//     });
+const courtBookings = async (req, res, next) => {
+  const { courtId } = req.params;
+  try {
+    const courtBooking = await Court.findAll({
+      where: { id: courtId },
+    });
 
-//     res.send(courtBooking)
-//   } catch (error) {
-//     next(error);
-//   }
-// }
+    res.send(courtBooking)
+  } catch (error) {
+    next(error);
+  }
+}
 ;
 
 module.exports = {
