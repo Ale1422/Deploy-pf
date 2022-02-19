@@ -20,6 +20,7 @@ const createPreference = async (req, res, next) => {
     attributes: ["name", "lastName", "email"]
   })
 
+
   console.log('startTime',startTime)
   console.log('typeof startTime',typeof startTime)
 
@@ -84,25 +85,23 @@ const createPreference = async (req, res, next) => {
         email: user.email
     },
     back_urls: {
-      success: "https://localhost:3000/profile",
+      success: "https://localhost:3000",
       failure: "https://localhost:3000",
       pending: "https://localhost:3000"
     },
     auto_return: "approved",
-    notification_url: "https://pi-foodandcook.herokuapp.com/booking/new",
+    notification_url: "https://api-pf-booking.herokuapp.com/booking/new",
     statement_descriptor: establishmentName,
     external_reference: toString(userId),
-    expires: true,
-    binary_mode: true,
+    expires: true
  }
   mercadopago.preferences
     .create(preference)
 
     .then(function (response) {
       //Este valor reemplazará el string"<%= global.id %>" en tu HTML
-      console.log(response)
-      global.id = response.body.sandbox_init_point;
-      res.send(response.body.sandbox_init_point);
+      global.id = response.body.id;
+      res.send(global.id);
     })
     .catch(function (error) {
       console.log(error);
