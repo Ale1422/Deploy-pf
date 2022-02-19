@@ -99,6 +99,7 @@ const createPreference = async (req, res, next) => {
 
     .then(function (response) {
       //Este valor reemplazará el string"<%= global.id %>" en tu HTML
+      console.log(response)
       global.id = response.body.id;
       res.send(global.id);
     })
