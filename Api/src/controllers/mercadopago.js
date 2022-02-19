@@ -19,8 +19,6 @@ const createPreference = async (req, res, next) => {
     where:{id: userId},
     attributes: ["name", "lastName", "email"]
   })
-  console.log(user)
-  console.log(req.body)
 
   console.log('startTime',startTime)
   console.log('typeof startTime',typeof startTime)
