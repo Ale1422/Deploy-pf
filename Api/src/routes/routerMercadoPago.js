@@ -3,7 +3,7 @@ const timeIp = require('../middleware/timeIp.js');
 const router = require('express').Router();
 
 //Ruta que genera la URL de MercadoPago
-router.post("/", timeIp, createPreference) 
+router.post("/", timeIp, userExtractor, authGoogle, createPreference) 
 
 //Ruta que recibe la información del pago y crea la orden
 // router.post("/new", newBooking)
