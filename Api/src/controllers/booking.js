@@ -32,7 +32,7 @@ const newBooking = async (req, res, next) => {
           <h2>&#9917; ${external_reference} &#9917;</h2>
           `;
           let booking = {
-             userId = req.params.userId,
+             userId = userId,
              courtId = payData.aditional_info.items.id,
              price = payData.aditional_info.items.unit_price,
              startTime = new Date(year,month-1,day,hour),
@@ -63,54 +63,54 @@ const newBooking = async (req, res, next) => {
 
 }
 
-const newBookingMp = async (req, res, next) => {
-  const userId = req.params.userId;
-  const courtId = req.params.courtId;
-  const price = req.params.price;
-  const startTime = new Date(req.params.startTime);
-  const endTime = new Date(req.params.endTime);
-  const payment_id = req.query.payment_id;
-  const payment_status = req.query.status;
-  const external_reference = req.query.external_reference;
-  const merchant_order_id = req.query.merchant_order_id;
+// const newBookingMp = async (req, res, next) => {
+//   const userId = req.params.userId;
+//   const courtId = req.params.courtId;
+//   const price = req.params.price;
+//   const startTime = new Date(req.params.startTime);
+//   const endTime = new Date(req.params.endTime);
+//   const payment_id = req.query.payment_id;
+//   const payment_status = req.query.status;
+//   const external_reference = req.query.external_reference;
+//   const merchant_order_id = req.query.merchant_order_id;
 
-  console.log(userId);
+//   console.log(userId);
 
-  /*
-     ESTO ES IMPORTANTE PARA CREAR BIEN LA RESERVA CON EL FORMATO DATE EN LA BASE DE DATOS
-     posiblemente les haya funcionado porque el string que tienen se los pase como debe ser pero no esta bueno mandarle asi y aca los meses se enumeran distinto es una cosa loca lo que van a tener que hacer es lo que sigue:
+//   /*
+//      ESTO ES IMPORTANTE PARA CREAR BIEN LA RESERVA CON EL FORMATO DATE EN LA BASE DE DATOS
+//      posiblemente les haya funcionado porque el string que tienen se los pase como debe ser pero no esta bueno mandarle asi y aca los meses se enumeran distinto es una cosa loca lo que van a tener que hacer es lo que sigue:
      
-  CUANDO RECIBAN EL OBJETO QUE MANDA EL FRONT CON year, month, date, y startTime hay que separar si o si el estar time en hora y minutos con un split y crear la fecha asi:
+//   CUANDO RECIBAN EL OBJETO QUE MANDA EL FRONT CON year, month, date, y startTime hay que separar si o si el estar time en hora y minutos con un split y crear la fecha asi:
   
-  let startTime = new Date (year, month, date, hour, minute, 00)
+//   let startTime = new Date (year, month, date, hour, minute, 00)
 
-  agreguen los ceros que son re importantes para la comparación de si hay canchas disponibles
-  lo mismo para el endTime si les falla manden mensaje y vemos que onda eso si o si tiene que ser en el backend porque el servidor es el que hace eso
+//   agreguen los ceros que son re importantes para la comparación de si hay canchas disponibles
+//   lo mismo para el endTime si les falla manden mensaje y vemos que onda eso si o si tiene que ser en el backend porque el servidor es el que hace eso
      
-     */
+//      */
 
-  Booking.create({
-    courtId: courtId,
-    userId: userId,
-    status: "completed",
-    finalAmount: price,
-    startTime: startTime,
-    endTime: endTime,
-    payment_id: payment_id,
-    payment_status: payment_status,
-    merchant_order_id: merchant_order_id,
-    external_reference: external_reference,
-  })
-    .then((booking) => {
-      console.log(booking);
-      console.info("redirect success");
-      return res.redirect(`http://localhost:3000/profile`);
-    })
-    .catch((err) => {
-      console.log("error al buscar", err);
-      return res.redirect(`http://localhost:3000/payment`);
-    });
-};
+//   Booking.create({
+//     courtId: courtId,
+//     userId: userId,
+//     status: "completed",
+//     finalAmount: price,
+//     startTime: startTime,
+//     endTime: endTime,
+//     payment_id: payment_id,
+//     payment_status: payment_status,
+//     merchant_order_id: merchant_order_id,
+//     external_reference: external_reference,
+//   })
+//     .then((booking) => {
+//       console.log(booking);
+//       console.info("redirect success");
+//       return res.redirect(`http://localhost:3000/profile`);
+//     })
+//     .catch((err) => {
+//       console.log("error al buscar", err);
+//       return res.redirect(`http://localhost:3000/payment`);
+//     });
+// };
 
 //this code needs reviewing and modularizing (i know ill get to it when i get to it)
 const getCourtAvailability = async (req, res, next) => {
