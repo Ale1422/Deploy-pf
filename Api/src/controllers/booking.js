@@ -32,7 +32,7 @@ const newBooking = async (req, res, next) => {
           <h2>&#9917; ${external_reference} &#9917;</h2>
           `;
           let booking = {
-             userId = userId,
+             userId = userData.id,
              courtId = payData.aditional_info.items.id,
              price = payData.aditional_info.items.unit_price,
              startTime = new Date(year,month-1,day,hour),
