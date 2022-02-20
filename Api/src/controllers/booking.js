@@ -16,7 +16,7 @@ const getAllBookings = async (req, res, next) => {
 };
 
 const newBooking = async (req, res, next) => {
-  //const {data}= req.body
+  const data= req.body
 
   try {    
     //const payData= await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=${ACCESS_TOKEN}`).data
@@ -57,7 +57,7 @@ const newBooking = async (req, res, next) => {
     //       res.status(200).send(data.id)
     // }
     console.log(req.body);
-    res.status(200).send(req.body)
+    res.status(200).send(data)
   } catch (error) {
       res.status(404).send(error)
   }
