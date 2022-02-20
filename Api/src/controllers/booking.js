@@ -24,7 +24,7 @@ const newBooking = async (req, res, next) => {
           const [year,month,day,hour] = payData.aditional_info.items.description.split(',')
           const [external_reference, userId] = payData.external_reference.split('-')
           const userData = await User.findOne({ where: { id: userId } });
-
+          console.log(userId)
           let contentHTML = `
           <h3>Hola, ${userData.name}!</h3>
 
@@ -32,7 +32,7 @@ const newBooking = async (req, res, next) => {
           <h2>&#9917; ${external_reference} &#9917;</h2>
           `;
           let booking = {
-             userId = userData.id,
+              userId ,
              courtId = payData.aditional_info.items.id,
              price = payData.aditional_info.items.unit_price,
              startTime = new Date(year,month-1,day,hour),
