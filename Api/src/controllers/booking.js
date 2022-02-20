@@ -56,7 +56,8 @@ const newBooking = async (req, res, next) => {
     //         });
     //       res.status(200).send(data.id)
     // }
-    res.status(200).send(payData)
+    console.log(req.body);
+    res.status(200).send(req.body)
   } catch (error) {
       res.status(404).send(error)
   }
