@@ -3,6 +3,7 @@ const {axios}=require('axios')
 // const { DB_HOST, TUCANCHAYAMAIL, TUCANCHAYAMAILPASS } = process.env;
 // const nodemailer = require("nodemailer");
 const { randomString, minutesToHour } = require("./utils/utils");
+const {ACCESS_TOKEN}=process.env
 
 const getAllBookings = async (req, res, next) => {
   try {
@@ -16,16 +17,45 @@ const getAllBookings = async (req, res, next) => {
 
 const newBooking = async (req, res, next) => {
   const {data}= req.body
-  try {
 
-//      if(payData.data.status_detail === "accredited"){
-          // const reporte = await Report.create({
-          //     name: payData.data.status,
-          //     idpago: payData.data.status_detail
-          // })
-          console.log(data)
-          res.status(200).send(data)
-//      }
+  try {    
+    const payData= await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=${ACCESS_TOKEN}`).data
+    if(payData.status_detail === "accredited"){
+          const {year,month,day,hour} = payData.aditional_info.items.description.split(',')
+          const {external_reference, userId} = payData.external_reference.split('-')
+          const userData = await User.findOne({ where: { id: userId } });
+
+          let contentHTML = `
+          <h3>Hola, ${userData.name}!</h3>
+
+          <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
+          <h2>&#9917; ${external_reference} &#9917;</h2>
+          `;
+          let booking = {
+             userId = req.params.userId,
+             courtId = payData.aditional_info.items.id,
+             price = payData.aditional_info.items.unit_price,
+             startTime = new Date(year,month-1,day,hour),
+             endTime = new Date(year,month-1,day,hour+1),
+             payment_id = payData.id,
+             payment_status = payData.status_detail,
+             external_reference = req.query.external_reference,
+             merchant_order_id = payData.order.id,
+          }
+          const newBooking = Booking.create(booking)
+            const sendMail = emailSender(userData.email, contentHTML)
+            Promise.all([newBooking,sendMail])
+            .then((response) => {
+              console.log(response);
+              console.info("redirect success");
+              return res.redirect(`http://localhost:3000/profile`);
+            })
+            .catch((err) => {
+              console.log("error al buscar", err);
+              return res.redirect(`http://localhost:3000/payment`);
+            });
+          res.status(200).send(data.id)
+    }
   } catch (error) {
       res.status(404).send(error)
   }
@@ -233,39 +263,32 @@ const getBookingsByEstablishment = async (req,res)=>{
 
   res.send(establishment)
 }
-// async function emailSender(userId, code) {
-//   const userData = await User.findOne({ where: { id: userId } });
+async function emailSender(userEmail, contentHTML) {
 
-//   let contentHTML = `
-//   <h3>Hola, ${userData.name}!</h3>
+  let transporter = nodemailer.createTransport({
+    host: "smtp.mailgun.org",
+    port: 587,
+    secure: false, // sin SSL
+    auth: {
+      user: TUCANCHAYAMAIL, // generated ethereal user
+      pass: TUCANCHAYAMAILPASS, // generated ethereal password
+    },
+  });
 
-//   <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
-//   <h2>&#9917; ${code} &#9917;</h2>
-//   `;
-//   let transporter = nodemailer.createTransport({
-//     host: "smtp.mailgun.org",
-//     port: 587,
-//     secure: false, // sin SSL
-//     auth: {
-//       user: TUCANCHAYAMAIL, // generated ethereal user
-//       pass: TUCANCHAYAMAILPASS, // generated ethereal password
-//     },
-//   });
+  const response = await transporter.sendMail({
+    from: "'Tu Cancha YA!' <tucanchaya@noresponse.com>",
+    to: `${userEmail}`,
+    subject: "Codigo de reserva",
+    html: contentHTML,
+  });
 
-//   const response = await transporter.sendMail({
-//     from: "'Tu Cancha YA!' <tucanchaya@noresponse.com>",
-//     to: `${userData.email}`,
-//     subject: "Codigo de reserva",
-//     html: contentHTML,
-//   });
-
-//   console.log(response);
-// }
-// const prueba = async (req, res, next) => {
-//   let code = randomString(8);
-//   emailSender(1, code);
-//   res.send("funciona");
-// };
+  console.log(response);
+}
+const prueba = async (req, res, next) => {
+  let code = randomString(8);
+  emailSender(1, code);
+  res.send("funciona");
+};
 const courtBookings = async (req, res, next) => {
   const { courtId } = req.params;
   try {
