@@ -20,42 +20,43 @@ const newBooking = async (req, res, next) => {
 
   try {    
     const payData= await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=${ACCESS_TOKEN}`).data
-    if(payData.status_detail === "accredited"){
-          const [year,month,day,hour] = payData.aditional_info.items.description.split(',')
-          const [external_reference, userId] = payData.external_reference.split('-')
-          const userData = await User.findOne({ where: { id: userId } });
-          console.log(userId)
-          let contentHTML = `
-          <h3>Hola, ${userData.name}!</h3>
+    // if(payData.status_detail === "accredited"){
+    //       const [year,month,day,hour] = payData.aditional_info.items.description.split(',')
+    //       const [external_reference, userId] = payData.external_reference.split('-')
+    //       const userData = await User.findOne({ where: { id: userId } });
+    //       console.log(userId)
+    //       let contentHTML = `
+    //       <h3>Hola, ${userData.name}!</h3>
 
-          <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
-          <h2>&#9917; ${external_reference} &#9917;</h2>
-          `;
-          let booking = {
-              userId ,
-             courtId = payData.aditional_info.items.id,
-             price = payData.aditional_info.items.unit_price,
-             startTime = new Date(year,month-1,day,hour),
-             endTime = new Date(year,month-1,day,hour+1),
-             payment_id = payData.id,
-             payment_status = payData.status_detail,
-             external_reference = req.query.external_reference,
-             merchant_order_id = payData.order.id,
-          }
-          const newBooking = Booking.create(booking)
-            const sendMail = emailSender(userData.email, contentHTML)
-            Promise.all([newBooking,sendMail])
-            .then((response) => {
-              console.log(response);
-              console.info("redirect success");
-              return res.redirect(`http://localhost:3000/profile`);
-            })
-            .catch((err) => {
-              console.log("error al buscar", err);
-              return res.redirect(`http://localhost:3000/payment`);
-            });
-          res.status(200).send(data.id)
-    }
+    //       <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
+    //       <h2>&#9917; ${external_reference} &#9917;</h2>
+    //       `;
+    //       let booking = {
+    //           userId ,
+    //          courtId = payData.aditional_info.items.id,
+    //          price = payData.aditional_info.items.unit_price,
+    //          startTime = new Date(year,month-1,day,hour),
+    //          endTime = new Date(year,month-1,day,hour+1),
+    //          payment_id = payData.id,
+    //          payment_status = payData.status_detail,
+    //          external_reference = req.query.external_reference,
+    //          merchant_order_id = payData.order.id,
+    //       }
+    //       const newBooking = Booking.create(booking)
+    //         const sendMail = emailSender(userData.email, contentHTML)
+    //         Promise.all([newBooking,sendMail])
+    //         .then((response) => {
+    //           console.log(response);
+    //           console.info("redirect success");
+    //           return res.redirect(`http://localhost:3000/profile`);
+    //         })
+    //         .catch((err) => {
+    //           console.log("error al buscar", err);
+    //           return res.redirect(`http://localhost:3000/payment`);
+    //         });
+    //       res.status(200).send(data.id)
+    // }
+    res.status(200).send(payData)
   } catch (error) {
       res.status(404).send(error)
   }
