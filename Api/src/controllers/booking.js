@@ -23,7 +23,7 @@ const newBooking = async (req, res, next) => {
   try {
     const payData = await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=TEST-8344826949636961-021621-fa6f50dd49774c61c2de981dba9fbeae-157434994`)
     console.log(payData.data.additional_info.items.description.split(','))
-    const external_reference = payData.data.external_reference.split('-')
+    const external_reference = payData.data.external_reference
     console.log("SOY EXTERNAL REFERENCE",splitInfo)
     const userData = await User.findOne({ where: { id: 1 } });
     if (payData.data.status_detail === "accredited") {
@@ -34,7 +34,7 @@ const newBooking = async (req, res, next) => {
           <h2>&#9917; ${external_reference} &#9917;</h2>
           `;
       let booking = {
-        userId,
+        userId: userData.id,
         courtId : payData.data.additional_info.items.id,
         price : payData.data.additional_info.items.unit_price,
         startTime : new Date(year, month - 1, day, hour),
