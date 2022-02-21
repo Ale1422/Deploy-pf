@@ -23,11 +23,11 @@ const newBooking = async (req, res, next) => {
 
   try {
       if(payData.data.status_detail === "accredited"){
-          const reporte = await Report.create({
-              name: payData.data.status,
-              idpago: payData.data.status_detail
-          })
-          res.status(200).send(reporte)
+          // const reporte = await Report.create({
+          //     name: payData.data.status,
+          //     idpago: payData.data.status_detail
+          // })
+          res.status(200).send(payData.data)
       }
   } catch (error) {
       res.status(404).send(error)
