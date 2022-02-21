@@ -26,7 +26,7 @@ const newBooking = async (req, res, next) => {
     const [year, month, day, hour] = payData.data.additional_info.items.description.split(',')
     const [external_reference, userId] = payData.data.external_reference.split('-')
     console.log(payData.data.external_reference)
-    console.log(userId)
+    console.log(userId, external_reference)
     if (payData.data.status_detail === "accredited") {
       const userData = await User.findOne({ where: { id: userId } });
       let contentHTML = `
