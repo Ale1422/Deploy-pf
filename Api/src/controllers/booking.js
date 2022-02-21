@@ -22,6 +22,7 @@ const newBooking = async (req, res, next) => {
 
   try {
     const payData = await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=TEST-8344826949636961-021621-fa6f50dd49774c61c2de981dba9fbeae-157434994`).data
+    console.log(payData);
     if (payData.status_detail === "accredited") {
       const [year, month, day, hour] = payData.additional_info.items.description.split(',')
       const [external_reference, userId] = payData.external_reference.split('-')
