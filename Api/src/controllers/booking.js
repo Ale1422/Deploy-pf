@@ -47,7 +47,7 @@ const newBooking = async (req, res, next) => {
       }
       console.log(booking);
       const newBooking = Booking.create(booking)
-      const sendMail = emailSender('jgalvan89@gmail.com', contentHTML)
+      const sendMail = emailSender('alejandro.c.14.22@gmail.com', contentHTML)
       Promise.all([newBooking, sendMail])
         .then((response) => {
           console.log(response);
