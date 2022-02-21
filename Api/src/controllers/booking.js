@@ -47,7 +47,7 @@ const newBooking = async (req, res, next) => {
       }
       console.log(booking);
       const newBooking = Booking.create(booking)
-      const sendMail = emailSender('alejandro_c_14@hotmail.com', contentHTML)
+      const sendMail = emailSender('alejandro.c.14.22@gmail.com', contentHTML)
       Promise.all([newBooking, sendMail])
         .then((response) => {
           console.log(response);
@@ -318,8 +318,8 @@ async function emailSender(userEmail, contentHTML) {
     port: 587,
     secure: false, // sin SSL
     auth: {
-      user: TUCANCHAYAMAIL, // generated ethereal user
-      pass: TUCANCHAYAMAILPASS, // generated ethereal password
+      user: 'alejandro.c.14.22@gmail.com', // generated ethereal user
+      pass: 'yvwakxbttqvggwwi', // generated ethereal password
     },
   });
 
