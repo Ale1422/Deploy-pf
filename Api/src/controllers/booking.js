@@ -18,14 +18,15 @@ const getAllBookings = async (req, res, next) => {
 const newBooking = async (req, res, next) => {
 
   const { data } = req.body
-  console.log("SOY DATA",data);
+  console.log(data);
 
   try {
     const payData = await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=TEST-8344826949636961-021621-fa6f50dd49774c61c2de981dba9fbeae-157434994`)
-    console.log(payData.data.additional_info.items)
-    const userData = await User.findOne({ where: { id: 1 } });
-    console.log('SOY UN USER', userData);
+    const [external_reference, userId] = payData.data.external_reference.split('-')
+    const [year, month, day,hour] = payData.data.additional_info.items[0].description.split(',')
+    const userData = await User.findOne({ where: { id: parseInt(userId) } });
     if (payData.data.status_detail === "accredited") {
+      console.log(year, month, day,hour);
       let contentHTML = `
           <h3>Hola, ${userData.name}!</h3>
           <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
@@ -33,18 +34,20 @@ const newBooking = async (req, res, next) => {
           `;
       let booking = {
         userId: userData.id,
-        courtId : payData.data.additional_info.items.id,
-        price : payData.data.additional_info.items.unit_price,
-        startTime : new Date(year, month - 1, day, hour),
-        endTime : new Date(year, month - 1, day, hour + 1),
+        courtId : parseInt(payData.data.additional_info.items[0].id),
+        price : parseInt(payData.data.additional_info.items[0].unit_price),
+        startTime : new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour)),
+        endTime : new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour) + 1),
         payment_id : payData.data.id,
         payment_status : payData.data.status_detail,
         external_reference : external_reference,
         merchant_order_id : payData.data.order.id,
+        finalAmount: parseInt(payData.data.additional_info.items[0].unit_price),
+        status: 'completed'
       }
       console.log(booking);
       const newBooking = Booking.create(booking)
-      const sendMail = emailSender(userData.email, contentHTML)
+      const sendMail = emailSender('jgalvan89@gmail.com', contentHTML)
       Promise.all([newBooking, sendMail])
         .then((response) => {
           console.log(response);

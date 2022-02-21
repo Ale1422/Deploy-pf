@@ -10,7 +10,7 @@ router.get("/", timeIp, getAllBookings);
 router.get("/availability/:id", timeIp, getCourtAvailability);
 router.get("/:courtId", timeIp, courtBookings)
 // tratar de ver esto con Dan
-router.post('/new', newBooking)
+router.post('/new', timeIp,  newBooking)
 router.get('/byEstab/:establishmentId', getBookingsByEstablishment)
 
 module.exports = router;
