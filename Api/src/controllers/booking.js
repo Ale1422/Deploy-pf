@@ -27,7 +27,7 @@ const newBooking = async (req, res, next) => {
     console.log("SOY EXTERNAL REFERENCE",splitInfo)
     console.log(year,month,day,hour);
     if (payData.data.status_detail === "accredited") {
-      const userData = await User.findOne({ where: { id: parseInt(userId) } });
+      const userData = await User.findOne({ where: { id: 1 } });
       console.log('SOY UN USER');
       let contentHTML = `
           <h3>Hola, ${userData.name}!</h3>
