@@ -3,7 +3,7 @@ const axios = require('axios')
 // const { DB_HOST, TUCANCHAYAMAIL, TUCANCHAYAMAILPASS } = process.env;
 // const nodemailer = require("nodemailer");
 const { randomString, minutesToHour } = require("./utils/utils");
-const {ACCESS_TOKEN}=process.env
+const { ACCESS_TOKEN } = process.env
 
 const getAllBookings = async (req, res, next) => {
   try {
@@ -17,20 +17,48 @@ const getAllBookings = async (req, res, next) => {
 
 const newBooking = async (req, res, next) => {
 
-  const {data}= req.body
+  const { data } = req.body
   console.log(data);
-  const payData = await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=TEST-8344826949636961-021621-fa6f50dd49774c61c2de981dba9fbeae-157434994`)
 
   try {
-      if(payData.data.status_detail === "accredited"){
-          // const reporte = await Report.create({
-          //     name: payData.data.status,
-          //     idpago: payData.data.status_detail
-          // })
-          res.status(200).send(payData.data)
+    const payData = await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=TEST-8344826949636961-021621-fa6f50dd49774c61c2de981dba9fbeae-157434994`)
+    if (payData.data.status_detail === "accredited") {
+      const [year, month, day, hour] = payData.aditional_info.items.description.split(',')
+      const [external_reference, userId] = payData.external_reference.split('-')
+      const userData = await User.findOne({ where: { id: userId } });
+      console.log(userId)
+      let contentHTML = `
+          <h3>Hola, ${userData.name}!</h3>
+
+          <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
+          <h2>&#9917; ${external_reference} &#9917;</h2>
+          `;
+      let booking = {
+        userId,
+        courtId = payData.aditional_info.items.id,
+        price = payData.aditional_info.items.unit_price,
+        startTime = new Date(year, month - 1, day, hour),
+        endTime = new Date(year, month - 1, day, hour + 1),
+        payment_id = payData.id,
+        payment_status = payData.status_detail,
+        external_reference = req.query.external_reference,
+        merchant_order_id = payData.order.id,
       }
+      const newBooking = Booking.create(booking)
+      const sendMail = emailSender(userData.email, contentHTML)
+      Promise.all([newBooking, sendMail])
+        .then((response) => {
+          console.log(response);
+          console.info("redirect success");
+          return res.redirect(`http://localhost:3000/profile`);
+        })
+        .catch((err) => {
+          console.log("error al buscar", err);
+          return res.redirect(`http://localhost:3000/payment`);
+        });
+    }
   } catch (error) {
-      res.status(404).send(error)
+    res.status(404).send(error)
   }
   // const data= req.body
 
@@ -97,14 +125,14 @@ const newBooking = async (req, res, next) => {
 //   /*
 //      ESTO ES IMPORTANTE PARA CREAR BIEN LA RESERVA CON EL FORMATO DATE EN LA BASE DE DATOS
 //      posiblemente les haya funcionado porque el string que tienen se los pase como debe ser pero no esta bueno mandarle asi y aca los meses se enumeran distinto es una cosa loca lo que van a tener que hacer es lo que sigue:
-     
+
 //   CUANDO RECIBAN EL OBJETO QUE MANDA EL FRONT CON year, month, date, y startTime hay que separar si o si el estar time en hora y minutos con un split y crear la fecha asi:
-  
+
 //   let startTime = new Date (year, month, date, hour, minute, 00)
 
 //   agreguen los ceros que son re importantes para la comparación de si hay canchas disponibles
 //   lo mismo para el endTime si les falla manden mensaje y vemos que onda eso si o si tiene que ser en el backend porque el servidor es el que hace eso
-     
+
 //      */
 
 //   Booking.create({
@@ -227,52 +255,52 @@ const getCourtAvailability = async (req, res, next) => {
 
 
 
-const getBookingsByEstablishment = async (req,res)=>{
-  var dateFrom = req.query.dateFrom ? new Date(req.query.dateFrom):null;
-  var dateTo = req.query.dateTo ? new Date(req.query.dateTo):null;
+const getBookingsByEstablishment = async (req, res) => {
+  var dateFrom = req.query.dateFrom ? new Date(req.query.dateFrom) : null;
+  var dateTo = req.query.dateTo ? new Date(req.query.dateTo) : null;
   var siteId = req.query.siteId;
   var sport = req.query.sport
   const establishmentId = req.params.establishmentId;
 
-  console.log('dateTo',dateTo);
-  console.log('dateFrom',dateFrom);
+  console.log('dateTo', dateTo);
+  console.log('dateFrom', dateFrom);
 
   var establishment = await Establishment.findOne({
-    where:{
+    where: {
       id: establishmentId
     },
     attributes: ['id'],
-    include:{
+    include: {
       model: Site,
       as: 'sites',
       attributes: ['name'],
-      where:{
+      where: {
         [Op.and]: [
-        siteId? {id:siteId}:null
+          siteId ? { id: siteId } : null
         ]
       },
-      include:{
+      include: {
         model: Court,
         as: 'courts',
-        attributes: ['name','sport'],
-        where:{
+        attributes: ['name', 'sport'],
+        where: {
           [Op.and]: [
-          sport? {sport:sport} : null
+            sport ? { sport: sport } : null
           ]
         },
-        include:{
-          model:Booking,
+        include: {
+          model: Booking,
           as: 'booking',
-          attributes:['startTime', 'external_reference', 'payment_status'],
-          where:{
+          attributes: ['startTime', 'external_reference', 'payment_status'],
+          where: {
             [Op.and]: [
-              dateTo?{startTime: {[Op.lte]: dateTo }}:null,
-              dateFrom?{startTime: {[Op.gte]: dateFrom}}:null,
-             ]
+              dateTo ? { startTime: { [Op.lte]: dateTo } } : null,
+              dateFrom ? { startTime: { [Op.gte]: dateFrom } } : null,
+            ]
           },
-          include:{
+          include: {
             model: User,
-            attributes:['id','name','lastName']
+            attributes: ['id', 'name', 'lastName']
           }
         }
       }
@@ -319,7 +347,7 @@ const courtBookings = async (req, res, next) => {
     next(error);
   }
 }
-;
+  ;
 
 module.exports = {
   getAllBookings,
