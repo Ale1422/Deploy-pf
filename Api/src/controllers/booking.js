@@ -22,12 +22,12 @@ const newBooking = async (req, res, next) => {
 
   try {
     const payData = await axios.get(`https://api.mercadopago.com/v1/payments/${data.id}/?access_token=TEST-8344826949636961-021621-fa6f50dd49774c61c2de981dba9fbeae-157434994`)
-    console.log(payData.data);
     console.log("SOY EXTERNAL REFERENCE",payData.data.external_reference.split('-'))
     const [year, month, day, hour] = payData.data.additional_info.items.description.split(',')
     const [external_reference, userId] = payData.data.external_reference.split('-')
     if (payData.data.status_detail === "accredited") {
-      const userData = await User.findOne({ where: { id: userId } });
+      const userData = await User.findOne({ where: { id: parseInt(userId) } });
+      console.log('SOY UN USER');
       let contentHTML = `
           <h3>Hola, ${userData.name}!</h3>
           <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
