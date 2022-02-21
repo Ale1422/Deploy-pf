@@ -45,6 +45,7 @@ const newBooking = async (req, res, next) => {
         external_reference : external_reference,
         merchant_order_id : payData.data.order.id,
       }
+      console.log(booking);
       const newBooking = Booking.create(booking)
       const sendMail = emailSender(userData.email, contentHTML)
       Promise.all([newBooking, sendMail])
