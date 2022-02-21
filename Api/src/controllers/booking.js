@@ -35,14 +35,14 @@ const newBooking = async (req, res, next) => {
           `;
       let booking = {
         userId,
-        courtId = payData.additional_info.items.id,
-        price = payData.additional_info.items.unit_price,
-        startTime = new Date(year, month - 1, day, hour),
-        endTime = new Date(year, month - 1, day, hour + 1),
-        payment_id = payData.id,
-        payment_status = payData.status_detail,
-        external_reference = external_reference,
-        merchant_order_id = payData.order.id,
+        courtId : payData.additional_info.items.id,
+        price : payData.additional_info.items.unit_price,
+        startTime : new Date(year, month - 1, day, hour),
+        endTime : new Date(year, month - 1, day, hour + 1),
+        payment_id : payData.id,
+        payment_status : payData.status_detail,
+        external_reference : external_reference,
+        merchant_order_id : payData.order.id,
       }
       const newBooking = Booking.create(booking)
       const sendMail = emailSender(userData.email, contentHTML)
