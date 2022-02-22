@@ -59,67 +59,7 @@ const newBooking = async (req, res, next) => {
   } catch (error) {
     res.status(404).send(error)
   }
-  // const data= req.body
-
-  // try {    
-  //   const payData= await axios.get(`https://api.mercadopago.com/v1/payments/${data.data.id}/?access_token=${ACCESS_TOKEN}`).data
-  //   // if(payData.status_detail === "accredited"){
-  //   //       const [year,month,day,hour] = payData.aditional_info.items.description.split(',')
-  //   //       const [external_reference, userId] = payData.external_reference.split('-')
-  //   //       const userData = await User.findOne({ where: { id: userId } });
-  //   //       console.log(userId)
-  //   //       let contentHTML = `
-  //   //       <h3>Hola, ${userData.name}!</h3>
-
-  //   //       <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
-  //   //       <h2>&#9917; ${external_reference} &#9917;</h2>
-  //   //       `;
-  //   //       let booking = {
-  //   //           userId ,
-  //   //          courtId = payData.aditional_info.items.id,
-  //   //          price = payData.aditional_info.items.unit_price,
-  //   //          startTime = new Date(year,month-1,day,hour),
-  //   //          endTime = new Date(year,month-1,day,hour+1),
-  //   //          payment_id = payData.id,
-  //   //          payment_status = payData.status_detail,
-  //   //          external_reference = req.query.external_reference,
-  //   //          merchant_order_id = payData.order.id,
-  //   //       }
-  //   //       const newBooking = Booking.create(booking)
-  //   //         const sendMail = emailSender(userData.email, contentHTML)
-  //   //         Promise.all([newBooking,sendMail])
-  //   //         .then((response) => {
-  //   //           console.log(response);
-  //   //           console.info("redirect success");
-  //   //           return res.redirect(`http://localhost:3000/profile`);
-  //   //         })
-  //   //         .catch((err) => {
-  //   //           console.log("error al buscar", err);
-  //   //           return res.redirect(`http://localhost:3000/payment`);
-  //   //         });
-  //   //       res.status(200).send(data.id)
-  //   // }
-  //   console.log(req.body);
-  //   res.status(200).send(payData)
-  // } catch (error) {
-  //     res.status(404).send(error)
-  // }
-
-
 }
-
-// const newBookingMp = async (req, res, next) => {
-//   const userId = req.params.userId;
-//   const courtId = req.params.courtId;
-//   const price = req.params.price;
-//   const startTime = new Date(req.params.startTime);
-//   const endTime = new Date(req.params.endTime);
-//   const payment_id = req.query.payment_id;
-//   const payment_status = req.query.status;
-//   const external_reference = req.query.external_reference;
-//   const merchant_order_id = req.query.merchant_order_id;
-
-//   console.log(userId);
 
 //   /*
 //      ESTO ES IMPORTANTE PARA CREAR BIEN LA RESERVA CON EL FORMATO DATE EN LA BASE DE DATOS
@@ -252,7 +192,61 @@ const getCourtAvailability = async (req, res, next) => {
   }
 };
 
+const getBookingsByEstId = async (req, res) => {
+  var dateFrom = req.query.dateFrom ? new Date(req.query.dateFrom):null;
+  var dateTo = req.query.dateTo ? new Date(req.query.dateTo):null;
+  var estId = req.params.estId;
 
+  const bookings = await Booking.findAll({
+    include:[{
+      model: Court,
+      attributes: [
+        'id',
+        'name',
+        'price',
+        'sport'
+      ],
+      include: {
+        model: Site,
+        attributes: [
+          'name',
+        ],
+        include: {
+          model: Establishment,
+          as: 'establishment',
+          attributes: [
+            'name',
+          ]
+        },
+      }
+    },
+    {
+      model: User,
+      attributes: [
+        'name',
+        'lastName'
+      ]
+    }
+    ],
+    where: {
+      [Op.and]: [
+        {'$court->site.establishmentId$': estId},
+        {'$booking.startTime$': {[Op.gte]: dateFrom}},
+        {'$booking.endTime$': {[Op.lte]: dateTo}},
+      ]
+    },
+    attributes: [
+      'id', 
+      'details', 
+      'startTime', 
+      'endTime', 
+      'payment_id',
+      'payment_status',
+    ]
+  })
+  let results = formatBookingsEst(bookings)
+  res.send(results)
+}
 
 const getBookingsByEstablishment = async (req, res) => {
   var dateFrom = req.query.dateFrom ? new Date(req.query.dateFrom) : null;
@@ -329,11 +323,6 @@ async function emailSender(userEmail, contentHTML) {
 
   console.log(response);
 }
-const prueba = async (req, res, next) => {
-  let code = randomString(8);
-  emailSender(1, code);
-  res.send("funciona");
-};
 const courtBookings = async (req, res, next) => {
   const { courtId } = req.params;
   try {
@@ -341,17 +330,42 @@ const courtBookings = async (req, res, next) => {
       where: { id: courtId },
     });
 
-    res.send(courtBooking)
+    res.send(courtBooking);
   } catch (error) {
     next(error);
   }
-}
-  ;
+};
+
+
+const addBooking = async (req, res, next) => {
+  const { courtId, details, dateFrom, dateTo, finalAmount } = req.body;
+  let external_reference = randomString(8)
+  // ES IMPORTANTE VER COMO ME MANDAN LA FECHA ACA ASI LA GUARDI DIRECTO O LA CONVIERTO A FORMATO FECHA COMO LE QUEDE MAS COMODO AL DAN EN EL FRONT
+  try {
+    const newBooking = await Booking.create({
+      courtId,
+      userId : 1,
+      details, 
+      status: 'approved',
+      startTime: dateFrom,
+      endTime: dateTo,
+      external_reference,
+      finalAmount
+    });
+
+    res.send(newBooking.external_reference);
+
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   getAllBookings,
   newBooking,
   getCourtAvailability,
   getBookingsByEstablishment,
-  courtBookings
+  getBookingsByEstId,
+  courtBookings,
+  addBooking
 };
