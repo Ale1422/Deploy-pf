@@ -47,12 +47,14 @@ const newBooking = async (req, res, next) => {
       const existent = Booking.findOne({
         where:{payment_id : payData.data.id}
       })
+      console.log('HOLA SOY EXISTENT', existent);
       if(!existent){
+        console.log('entre al if');
       const newBooking = Booking.create(booking)
       const sendMail = emailSender( userData.email, contentHTML)
       Promise.all([newBooking, sendMail])
         .then((response) => {
-          console.info("redirect success");
+          console.log("redirect success");
           return res.redirect(`http://localhost:3000/profile`);
         })
         .catch((err) => {
