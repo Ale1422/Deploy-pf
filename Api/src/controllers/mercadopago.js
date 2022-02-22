@@ -12,7 +12,7 @@ mercadopago.configure({
 
 const createPreference = async (req, res, next) => {
   const userId = req.user.id;
-  let { courtId, courtName, price, startTime, endTime, establishmentName} =
+  let { courtId, courtName, price, startTime, establishmentName} =
     req.body[0];
 
   const user = await User.findOne({
@@ -71,7 +71,6 @@ const createPreference = async (req, res, next) => {
       failure: "https://localhost:3000",
       pending: "https://localhost:3000"
     },
-    auto_return: "approved",
     notification_url: "https://api-pf-booking.herokuapp.com/booking/new",
     statement_descriptor: establishmentName,
     external_reference: randomString(8)+`-${userId}`,
