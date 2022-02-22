@@ -39,6 +39,7 @@ module.exports = (sequelize) => {
     },
     external_reference:{
       type: DataTypes.STRING,
+      unique: true,
       allowNull:false
     },
     details: {
