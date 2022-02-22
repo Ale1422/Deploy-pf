@@ -67,11 +67,11 @@ const createPreference = async (req, res, next) => {
         email: user.email
     },
     back_urls: {
-      success: "https://localhost:3000",
+      success: "https://api-pf-booking.herokuapp.com/booking/new",
       failure: "https://localhost:3000",
       pending: "https://localhost:3000"
     },
-    notification_url: "https://api-pf-booking.herokuapp.com/booking/new?source_news=webhooks",
+    notification_url: "https://api-pf-booking.herokuapp.com/booking/new",
     statement_descriptor: establishmentName,
     external_reference: randomString(8)+`-${userId}`,
     expires: true
