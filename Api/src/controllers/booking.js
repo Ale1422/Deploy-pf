@@ -44,7 +44,7 @@ const newBooking = async (req, res, next) => {
         finalAmount: parseInt(payData.data.additional_info.items[0].unit_price),
         status: 'completed'
       }
-      const existent = Booking.findOne({
+      const existent = await Booking.findOne({
         where:{payment_id : payData.data.id}
       })
       console.log('HOLA SOY EXISTENT', existent);
