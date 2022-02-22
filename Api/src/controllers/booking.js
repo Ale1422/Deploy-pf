@@ -1,6 +1,6 @@
 const { User, Establishment, Site, Court, Booking, Op } = require("../db");
 const axios = require('axios')
-const { DB_HOST, TUCANCHAYAMAIL, TUCANCHAYAMAILPASS } = process.env;
+const { DB_HOST, MAIL, PASS } = process.env;
 const nodemailer = require("nodemailer");
 const { randomString, minutesToHour } = require("./utils/utils");
 const { ACCESS_TOKEN } = process.env
@@ -26,7 +26,6 @@ const newBooking = async (req, res, next) => {
     const [year, month, day,hour] = payData.data.additional_info.items[0].description.split(',')
     const userData = await User.findOne({ where: { id: parseInt(userId) } });
     if (payData.data.status_detail === "accredited") {
-      console.log(year, month, day,hour);
       let contentHTML = `
           <h3>Hola, ${userData.name}!</h3>
           <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
@@ -45,12 +44,10 @@ const newBooking = async (req, res, next) => {
         finalAmount: parseInt(payData.data.additional_info.items[0].unit_price),
         status: 'completed'
       }
-      console.log(booking);
       const newBooking = Booking.create(booking)
-      const sendMail = emailSender('jgalvan89@gmail.com', contentHTML)
+      const sendMail = emailSender('alejandro.c.14.22@gmail.com', contentHTML)
       Promise.all([newBooking, sendMail])
         .then((response) => {
-          console.log(response);
           console.info("redirect success");
           return res.redirect(`http://localhost:3000/profile`);
         })
@@ -318,8 +315,8 @@ async function emailSender(userEmail, contentHTML) {
     port: 587,
     secure: false, // sin SSL
     auth: {
-      user: TUCANCHAYAMAIL, // generated ethereal user
-      pass: TUCANCHAYAMAILPASS, // generated ethereal password
+      user: MAIL, // generated ethereal user
+      pass: PASS, // generated ethereal password
     },
   });
 
