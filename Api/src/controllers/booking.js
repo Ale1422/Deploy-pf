@@ -186,7 +186,7 @@ const getCourtAvailability = async (req, res, next) => {
       });
     }
 
-    res.status(200).json([dayBookings, availability]);
+    res.status(200).json([availability]);
   } catch (e) {
     next(e);
   }
