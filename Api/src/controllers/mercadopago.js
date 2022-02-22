@@ -67,7 +67,7 @@ const createPreference = async (req, res, next) => {
         email: user.email
     },
     back_urls: {
-      success: "https://localhost:3000/success",
+      success: "http://localhost:3000/success",
       failure: "https://localhost:3000",
       pending: "https://localhost:3000"
     },
