@@ -22,7 +22,7 @@ module.exports = (sequelize) => {
      allowNull: false
     },
     status:{  
-      type: DataTypes.ENUM('created', 'processing', 'cancelled', 'completed'),
+      type: DataTypes.STRING,
      allowNull: false
     },
     payment_id:{
@@ -39,7 +39,6 @@ module.exports = (sequelize) => {
     },
     external_reference:{
       type: DataTypes.STRING,
-      unique: true,
       allowNull:false
     },
     details: {
