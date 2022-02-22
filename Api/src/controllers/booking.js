@@ -311,7 +311,7 @@ const getBookingsByEstablishment = async (req, res) => {
 async function emailSender(userEmail, contentHTML) {
 
   let transporter = nodemailer.createTransport({
-    host: "smtp.mailgun.org",
+    host: "smtp.ethereal.email",
     port: 587,
     secure: false, // sin SSL
     auth: {
