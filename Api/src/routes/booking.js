@@ -9,7 +9,7 @@ const router = Router();
 router.get("/", timeIp, getAllBookings);
 router.get("/availability/:id", timeIp, getCourtAvailability);
 router.get("/:courtId", timeIp, courtBookings)
-router.get('/new', timeIp, newBooking)
+router.post('/new', timeIp, newBooking)
 router.get('/byEstab/:establishmentId', timeIp, getBookingsByEstablishment)
 router.get('/byEstabId/:estId', timeIp, getBookingsByEstId)
 // NEW ROUTE TO ADD BOOKINGS FOR ESTABLISHMENTS
