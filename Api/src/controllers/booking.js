@@ -44,8 +44,12 @@ const newBooking = async (req, res, next) => {
         finalAmount: parseInt(payData.data.additional_info.items[0].unit_price),
         status: 'completed'
       }
+      const existent = Booking.findOne({
+        where:{payment_id : payData.data.id}
+      })
+      if(!existent){
       const newBooking = Booking.create(booking)
-      const sendMail = emailSender('alejandro.c.14.22@gmail.com', contentHTML)
+      const sendMail = emailSender( userData.email, contentHTML)
       Promise.all([newBooking, sendMail])
         .then((response) => {
           console.info("redirect success");
@@ -55,6 +59,9 @@ const newBooking = async (req, res, next) => {
           console.log("error al buscar", err);
           return res.redirect(`http://localhost:3000/payment`);
         });
+      }else{
+        res.status(200).send('Booking ok')
+      }
     }
   } catch (error) {
     res.status(404).send(error)
