@@ -41,6 +41,7 @@ function minutesToHour(min) {
   }
 
   async function emailSender(userEmail, contentHTML, booking) {
+    console.log(userEmail, booking);
     const courtInfo = await Court.findOne({
       where: { id: booking.courtId },
       include: { model: Site },
