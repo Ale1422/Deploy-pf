@@ -50,9 +50,9 @@ const newBooking = async (req, res, next) => {
       console.log('HOLA SOY EXISTENT', existent);
       if(!existent){
         console.log('entre al if');
-      const newBooking = Booking.create(booking)
-      const sendMail = emailSender( userData.email, contentHTML, booking)
-      Promise.all([newBooking, sendMail])
+      const sendMail = await emailSender( userData.email, contentHTML, booking)
+      console.log('Mande el mail');
+      Booking.create(booking)
         .then((response) => {
           console.log("redirect success");
           return res.redirect(`http://localhost:3000/profile`);
