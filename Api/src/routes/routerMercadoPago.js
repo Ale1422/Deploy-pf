@@ -1,5 +1,7 @@
 const { createPreference } =  require('../controllers/mercadopago.js');
 const timeIp = require('../middleware/timeIp.js');
+const userExtractor = require("../middleware/userExtractor");
+const authGoogle = require('../middleware/auth');
 const router = require('express').Router();
 
 //Ruta que genera la URL de MercadoPago
