@@ -1,3 +1,6 @@
+const { TUCANCHAYAMAIL, TUCANCHAYAMAILPASS } = process.env;
+
+
 function minutesToHour(min) {
     let newMin = min % 60 ? min % 60 : "00";
     let newHour = (min - newMin) / 60;
@@ -34,10 +37,56 @@ function minutesToHour(min) {
     return result
   }
 
+  async function emailSender(userEmail, contentHTML, booking) {
+    const courtInfo = await Court.findOne({
+      where: { id: booking.courtId },
+      include: { model: Site },
+    });
+  
+    let transporter = nodemailer.createTransport({
+      host: "smtp.mailgun.org",
+      port: 587,
+      secure: false, // sin SSL
+      auth: {
+        user: TUCANCHAYAMAIL, // generated ethereal user
+        pass: TUCANCHAYAMAILPASS, // generated ethereal password
+      },
+    });
+    const calendar = ical({ name: "Tu cancha Ya - Calendar" });
+    calendar.createEvent({
+      start: booking.startTime ,
+      end: booking.endTime,
+      summary: `Reserva de cancha ${courtInfo.sport}`,
+      description: `${courtInfo.sport}`,
+      location: {
+        title: ' ',
+        address:`${courtInfo.site.street} ${courtInfo.site.streetNumber.toString()} , ${courtInfo.site.city}`,
+        geo:{lat: parseFloat(courtInfo.site.latitude), lon: parseFloat(courtInfo.site.longitude)}
+      },
+      organizer: {
+        email: 'tucanchaya@noresponse.com',
+        name:"Tu cancha YA!"}
+    });
+  
+    const response = await transporter.sendMail({
+      from: "'Tu Cancha YA!' <tucanchaya@noresponse.com>",
+      to: userEmail,
+      subject: "Codigo de reserva",
+      html: contentHTML,
+      icalEvent: {
+        filename: "reservaCancha.ics",
+        method: "request",
+        content: calendar.toString(),
+      },
+    });
+
+  }
+
 
   module.exports = {
     randomString,
     minutesToHour,
-    formatBookingsEst
+    formatBookingsEst,
+    emailSender
   };
   

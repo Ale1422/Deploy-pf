@@ -1,6 +1,8 @@
 const { User, Establishment, Site, Court, Booking, Op } = require("../db");
+const ical = require("ical-generator");
 const axios = require('axios')
-const { DB_HOST, MAIL, PASS } = process.env;
+const emailSender = require('./utils/utils')
+const { DB_HOST } = process.env;
 const nodemailer = require("nodemailer");
 const { randomString, minutesToHour } = require("./utils/utils");
 const { ACCESS_TOKEN } = process.env
@@ -51,7 +53,7 @@ const newBooking = async (req, res, next) => {
       if(!existent){
         console.log('entre al if');
       const newBooking = Booking.create(booking)
-      const sendMail = emailSender( userData.email, contentHTML)
+      const sendMail = emailSender( userData.email, contentHTML, booking)
       Promise.all([newBooking, sendMail])
         .then((response) => {
           console.log("redirect success");
@@ -311,27 +313,7 @@ const getBookingsByEstablishment = async (req, res) => {
 
   res.send(establishment)
 }
-async function emailSender(userEmail, contentHTML) {
 
-  let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // sin SSL
-    auth: {
-      user: MAIL, // generated ethereal user
-      pass: PASS, // generated ethereal password
-    },
-  });
-
-  const response = await transporter.sendMail({
-    from: "'Tu Cancha YA!' <tucanchaya@noresponse.com>",
-    to: `${userEmail}`,
-    subject: "Codigo de reserva",
-    html: contentHTML,
-  });
-
-  console.log(response);
-}
 const courtBookings = async (req, res, next) => {
   const { courtId } = req.params;
   try {

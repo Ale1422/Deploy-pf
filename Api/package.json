@@ -23,6 +23,7 @@
     "express": "^4.17.2",
     "express-joi-validation": "^5.0.1",
     "google-auth-library": "^7.11.0",
+    "ical-generator": "^3.2.1",
     "ioredis": "^4.19.2",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
