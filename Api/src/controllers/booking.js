@@ -4,7 +4,7 @@ const { TUCANCHAYAMAIL, TUCANCHAYAMAILPASS } = process.env;
 const ical = require("ical-generator")
 const nodemailer = require("nodemailer");
 const { DB_HOST } = process.env;
-const { randomString, minutesToHour } = require("./utils/utils");
+const { randomString, minutesToHour, formatBookingsEst } = require("./utils/utils");
 
 
 async function sender(userEmail, contentHTML, booking) {
@@ -13,7 +13,6 @@ async function sender(userEmail, contentHTML, booking) {
     where: { id: booking.courtId },
     include: { model: Site },
   });
-console.log(1);
   let transporter = nodemailer.createTransport({
     host: "smtp.mailgun.org",
     port: 587,
@@ -24,7 +23,6 @@ console.log(1);
     },
   });
 
-  console.log(2);
   const calendar = ical({ name: "Tu cancha Ya - Calendar" });
   calendar.createEvent({
     start: booking.startTime ,
@@ -40,7 +38,6 @@ console.log(1);
       email: 'tucanchaya@noresponse.com',
       name:"Tu cancha YA!"}
   });
-  console.log(3);
   const response = await transporter.sendMail({
     from: "'Tu Cancha YA!' <tucanchaya@noresponse.com>",
     to: userEmail,
@@ -52,7 +49,6 @@ console.log(1);
       content: calendar.toString(),
     },
   });
-  console.log('termine');
 }
 
 
@@ -121,6 +117,7 @@ const newBooking = async (req, res, next) => {
   }
 }
 
+
 //   /*
 //      ESTO ES IMPORTANTE PARA CREAR BIEN LA RESERVA CON EL FORMATO DATE EN LA BASE DE DATOS
 //      posiblemente les haya funcionado porque el string que tienen se los pase como debe ser pero no esta bueno mandarle asi y aca los meses se enumeran distinto es una cosa loca lo que van a tener que hacer es lo que sigue:
@@ -133,29 +130,6 @@ const newBooking = async (req, res, next) => {
 //   lo mismo para el endTime si les falla manden mensaje y vemos que onda eso si o si tiene que ser en el backend porque el servidor es el que hace eso
 
 //      */
-
-//   Booking.create({
-//     courtId: courtId,
-//     userId: userId,
-//     status: "completed",
-//     finalAmount: price,
-//     startTime: startTime,
-//     endTime: endTime,
-//     payment_id: payment_id,
-//     payment_status: payment_status,
-//     merchant_order_id: merchant_order_id,
-//     external_reference: external_reference,
-//   })
-//     .then((booking) => {
-//       console.log(booking);
-//       console.info("redirect success");
-//       return res.redirect(`http://localhost:3000/profile`);
-//     })
-//     .catch((err) => {
-//       console.log("error al buscar", err);
-//       return res.redirect(`http://localhost:3000/payment`);
-//     });
-// };
 
 //this code needs reviewing and modularizing (i know ill get to it when i get to it)
 const getCourtAvailability = async (req, res, next) => {
@@ -252,6 +226,7 @@ const getCourtAvailability = async (req, res, next) => {
   }
 };
 
+
 const getBookingsByEstId = async (req, res) => {
   var dateFrom = req.query.dateFrom ? new Date(req.query.dateFrom):null;
   var dateTo = req.query.dateTo ? new Date(req.query.dateTo):null;
@@ -302,66 +277,80 @@ const getBookingsByEstId = async (req, res) => {
       'endTime', 
       'payment_id',
       'payment_status',
+      'external_reference'
     ]
   })
   let results = formatBookingsEst(bookings)
   res.send(results)
 }
 
-const getBookingsByEstablishment = async (req, res) => {
-  var dateFrom = req.query.dateFrom ? new Date(req.query.dateFrom) : null;
-  var dateTo = req.query.dateTo ? new Date(req.query.dateTo) : null;
+
+const getBookingsByEstablishment = async (req,res)=>{
+  var dateFrom = req.query.dateFrom ? new Date(req.query.dateFrom):null;
+  var dateTo = req.query.dateTo ? new Date(req.query.dateTo):null;
   var siteId = req.query.siteId;
-  var sport = req.query.sport
+  var sport = req.query.sport;
   const establishmentId = req.params.establishmentId;
 
-  console.log('dateTo', dateTo);
-  console.log('dateFrom', dateFrom);
+  console.log('dateFrom',dateFrom);
+  console.log('dateTo',dateTo);
 
-  var establishment = await Establishment.findOne({
-    where: {
-      id: establishmentId
-    },
-    attributes: ['id'],
-    include: {
-      model: Site,
-      as: 'sites',
-      attributes: ['name'],
-      where: {
-        [Op.and]: [
-          siteId ? { id: siteId } : null
-        ]
-      },
-      include: {
+  const bookings = await Booking.findAll({
+    include: [
+      {
         model: Court,
-        as: 'courts',
-        attributes: ['name', 'sport'],
-        where: {
-          [Op.and]: [
-            sport ? { sport: sport } : null
-          ]
-        },
+        as: "court",
         include: {
-          model: Booking,
-          as: 'booking',
-          attributes: ['startTime', 'external_reference', 'payment_status'],
-          where: {
-            [Op.and]: [
-              dateTo ? { startTime: { [Op.lte]: dateTo } } : null,
-              dateFrom ? { startTime: { [Op.gte]: dateFrom } } : null,
-            ]
-          },
+          model: Site,
+          as: "site",
           include: {
-            model: User,
-            attributes: ['id', 'name', 'lastName']
-          }
-        }
-      }
-    }
-  })
+            model: Establishment,
+            as: "establishment",
+          },
+        },
+      },
+      {
+        model: User,
+        as: "user",
+      },
+    ],
+    where: {
+      [Op.and]: [
+        {userId: {[Op.gte]:2}},
+        { "$court.site.establishmentId$": establishmentId },
+        siteId ? { "$court.site.id$": siteId } : null,
+        dateFrom ? { startTime: { [Op.gte]: dateFrom } } : null,
+        dateTo ? { startTime: { [Op.lte]: dateTo } } : null,
+        sport ? { "$court.sport$": sport } : null,
+      ],
+    },
+  });
 
-  res.send(establishment)
-}
+  let sortedBookings = await bookings.sort(function (c, d) {
+    if (c.startTime < d.startTime) {
+      return 1;
+    }
+    if (c.startTime > d.startTime) {
+      return -1;
+    }
+    return 0;
+  });
+
+  let mapingBookings = await sortedBookings.map((b) => {
+    return {
+      external_reference: b.external_reference,
+      day: b.startTime,
+      siteName: b.court.site.name,
+      courtName: b.court.name,
+      sport: b.court.sport,
+      finalAmount: b.finalAmount,
+    };
+  });
+
+  res.send(mapingBookings);
+};
+
+
 
 const courtBookings = async (req, res, next) => {
   const { courtId } = req.params;
@@ -398,7 +387,8 @@ const addBooking = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
+
 
 
 module.exports = {
