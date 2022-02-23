@@ -1,9 +1,7 @@
 const { User, Establishment, Site, Court, Booking, Op } = require("../db");
-const ical = require("ical-generator");
 const axios = require('axios')
 const emailSender = require('./utils/utils')
 const { DB_HOST } = process.env;
-const nodemailer = require("nodemailer");
 const { randomString, minutesToHour } = require("./utils/utils");
 const { ACCESS_TOKEN } = process.env
 
