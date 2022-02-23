@@ -42,7 +42,7 @@ function minutesToHour(min) {
       where: { id: booking.courtId },
       include: { model: Site },
     });
-  
+  console.log(1);
     let transporter = nodemailer.createTransport({
       host: "smtp.mailgun.org",
       port: 587,
@@ -52,6 +52,8 @@ function minutesToHour(min) {
         pass: TUCANCHAYAMAILPASS, // generated ethereal password
       },
     });
+
+    console.log(2);
     const calendar = ical({ name: "Tu cancha Ya - Calendar" });
     calendar.createEvent({
       start: booking.startTime ,
@@ -67,7 +69,7 @@ function minutesToHour(min) {
         email: 'tucanchaya@noresponse.com',
         name:"Tu cancha YA!"}
     });
-  
+    console.log(3);
     const response = await transporter.sendMail({
       from: "'Tu Cancha YA!' <tucanchaya@noresponse.com>",
       to: userEmail,
@@ -79,7 +81,7 @@ function minutesToHour(min) {
         content: calendar.toString(),
       },
     });
-
+    console.log('termine');
   }
 
 
