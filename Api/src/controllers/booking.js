@@ -101,7 +101,7 @@ const newBooking = async (req, res, next) => {
       console.log('HOLA SOY EXISTENT', existent);
       if(!existent){
         console.log('entre al if');
-      const sendMail = await sender('alejandro.c.14.22@gmail.com', contentHTML, booking)
+      const sendMail = await sender(userData.email, contentHTML, booking)
       console.log(sendMail);
       Booking.create(booking)
         .then((response) => {
