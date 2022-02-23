@@ -93,6 +93,5 @@ function minutesToHour(min) {
     randomString,
     minutesToHour,
     formatBookingsEst,
-    emailSender
   };
   
