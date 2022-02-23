@@ -7,6 +7,8 @@ const {
   Favorites,
 } = require("../db");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+
 
 const getAllUsers = async (req, res, next) => {
   try {
