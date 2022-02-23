@@ -1,8 +1,8 @@
 {
     "user": [
         {
-            "name": "DEFAULT",
-            "lastName": "DEFAULT",
+            "name": "Reserva",
+            "lastName": "Presencial",
             "phone": "000",
             "email": "a@dominio.com",
             "isAdmin": false
