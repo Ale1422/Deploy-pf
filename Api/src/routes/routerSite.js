@@ -23,10 +23,10 @@ const bodySchema = Joi.object({
 
 
 
-router.post('/', timeIp, userExtractor, authGoogle,validator.body(bodySchema), createSite)
 router.get('/location', timeIp, findByLocation)
 router.get('/:establishmentId', timeIp, userExtractor, authGoogle, getAllSites)
 router.get('/', timeIp, getAllSites)
+router.post('/', timeIp, userExtractor, authGoogle,validator.body(bodySchema), createSite)
 router.put('/updateStatusSite',updateStatusSite)
 
 module.exports = router
