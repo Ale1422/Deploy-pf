@@ -4,6 +4,7 @@ const authGoogle = require("../middleware/auth");
 const Joi = require("joi");
 const validator = require("express-joi-validation").createValidator({});
 const timeIp = require("../middleware/timeIp");
+const cors =require('cors')
 
 const {
   getAllUsers,
@@ -50,24 +51,19 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-router.delete("/fav/:courtId", userExtractor, authGoogle, delFavorite);
 
 router.get("/", timeIp, getAllUsers);
 router.get("/checkedEmail", timeIp, checkedEmail);
 router.get("/bookings", timeIp, userExtractor, authGoogle, getUserBookingHistory);
-
 router.get("/profile",timeIp, userExtractor, authGoogle, getUserProfile);
 router.get("/fav",timeIp, userExtractor, authGoogle, findFavorite);
-
+router.get("/onefav", timeIp, userExtractor, authGoogle, findOneFav)
 router.post("/googleRegister", timeIp, userExtractor, authGoogle, registerGoogle);
 router.post("/register", timeIp, validator.body(registerSchema), registerUser);
 router.post("/login", timeIp, validator.body(loginSchema), loginUser);
-
-
 router.put("/fav",timeIp, userExtractor, authGoogle, addfavorite);
-
-router.put("/edit",timeIp, userExtractor, authGoogle, editUser);
+router.put("/edit", cors(),timeIp, userExtractor, authGoogle, editUser);
 router.put("/updateStatus",timeIp, userExtractor, authGoogle, updateStatus);
-router.get("/onefav", timeIp, userExtractor, authGoogle, findOneFav)
+router.delete("/fav/:courtId", userExtractor, authGoogle, delFavorite);
 
 module.exports = router;
