@@ -350,7 +350,33 @@ const getBookingsByEstablishment = async (req,res)=>{
   res.send(mapingBookings);
 };
 
+async function emailSender(userId, code) {
+  const userData = await User.findOne({ where: { id: userId } });
 
+  let contentHTML = `
+  <h3>Hola, ${userData.name}!</h3>
+
+  <p> Gracias por usar nuestro servicio de reservas. Acercate con tu codigo de reserva a la cancha</p>
+  <h2>&#9917; ${code} &#9917;</h2> `;
+  let transporter = nodemailer.createTransport({
+    host: "smtp.mailgun.org",
+    port: 587,
+    secure: false, // sin SSL
+    auth: {
+      user: TUCANCHAYAMAIL, // generated ethereal user
+      pass: TUCANCHAYAMAILPASS, // generated ethereal password
+    },
+  });
+
+  const response = await transporter.sendMail({
+    from: "'Tu Cancha YA!' <tucanchaya@noresponse.com>",
+    to: `${userData.email}`,
+    subject: "Codigo de reserva",
+    html: contentHTML,
+  });
+
+  console.log(response);
+}
 
 const courtBookings = async (req, res, next) => {
   const { courtId } = req.params;
@@ -388,7 +414,6 @@ const addBooking = async (req, res, next) => {
     next(error);
   }
 };
-
 
 
 module.exports = {

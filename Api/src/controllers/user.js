@@ -8,6 +8,8 @@ const {
 } = require("../db");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const { TUCANCHAYAMAIL, TUCANCHAYAMAILPASS } = process.env;
+
 
 
 const getAllUsers = async (req, res, next) => {

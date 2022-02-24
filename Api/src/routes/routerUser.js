@@ -59,14 +59,11 @@ router.get("/bookings", timeIp, userExtractor, authGoogle, getUserBookingHistory
 router.get("/profile",timeIp, userExtractor, authGoogle, getUserProfile);
 router.get("/fav",timeIp, userExtractor, authGoogle, findFavorite);
 
-router.post("/googleRegister", userExtractor, authGoogle, registerGoogle);
-router.get("/fav", timeIp, userExtractor, authGoogle, findFavorite);
-router.get("/profile", timeIp, userExtractor, authGoogle, getUserProfile);
 router.post("/googleRegister", timeIp, userExtractor, authGoogle, registerGoogle);
 router.post("/register", timeIp, validator.body(registerSchema), registerUser);
 router.post("/login", timeIp, validator.body(loginSchema), loginUser);
 
-router.post("/login", timeIp, validator.body(loginSchema), loginUser);
+
 router.put("/fav",timeIp, userExtractor, authGoogle, addfavorite);
 
 router.put("/edit",timeIp, userExtractor, authGoogle, editUser);
