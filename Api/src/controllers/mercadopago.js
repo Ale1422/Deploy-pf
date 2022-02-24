@@ -14,6 +14,8 @@ const createPreference = async (req, res, next) => {
   const userId = req.user.id;
   let { courtId, courtName, price, startTime, establishmentName } =
     req.body[0];
+  const [year, month, day,hour] = startTime.split(',')
+
 
   const user = await User.findOne({
     where: { id: userId },
@@ -24,7 +26,7 @@ const createPreference = async (req, res, next) => {
     items: [
       {
         id: courtId,
-        title: `Turno en cancha ${courtName}`,
+        title: `Turno en ${courtName}-${day}-${month}-${year} `,
         quantity: 1,
         unit_price: price,
         description: startTime
