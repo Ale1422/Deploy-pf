@@ -62,8 +62,7 @@ router.post("/googleRegister", timeIp, userExtractor, authGoogle, registerGoogle
 router.post("/register", timeIp, validator.body(registerSchema), registerUser);
 router.post("/login", timeIp, validator.body(loginSchema), loginUser);
 router.put("/fav",timeIp, userExtractor, authGoogle, addfavorite);
-router.options("/edit", cors());
-router.put("/edit", cors(),timeIp, userExtractor, authGoogle, editUser);
+router.put("/edit",timeIp, userExtractor, authGoogle, editUser);
 router.put("/updateStatus",timeIp, userExtractor, authGoogle, updateStatus);
 router.delete("/fav/:courtId", userExtractor, authGoogle, delFavorite);
 
